@@ -3,11 +3,13 @@
   <head>
     <base target="_top">
     <style>
+
+
+
       /* Optional styling for a cleaner layout */
       body {
         font-family: Arial, sans-serif;
-        height: 100vh;
-        background-color: #f4f4f4;
+      
       }
       table {
         width: 100%;
@@ -16,6 +18,7 @@
       th, td {
         padding: 10px;
         text-align: left;
+        border: 1px solid rgba(100, 100, 100, 0.397);
       }
       th {
         background-color: #f2f2f2;
@@ -26,12 +29,21 @@
       }
       
       #loginForm {
-        background-color: #ffffff;
         padding: 20px;
         border-radius: 8px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         width: 300px;
         text-align: center;
+        box-shadow: 0 0.3px 0.7px rgba(0, 0, 0, 0.126),
+    0 0.9px 1.7px rgba(0, 0, 0, 0.179), 0 1.8px 3.5px rgba(0, 0, 0, 0.224),
+    0 3.7px 7.3px rgba(0, 0, 0, 0.277), 0 10px 20px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(20px);
+  transition: 0.5s ease;
+  &:hover {
+    box-shadow: 0 0.7px 1px rgba(0, 0, 0, 0.157),
+      0 1.7px 2.6px rgba(0, 0, 0, 0.224), 0 3.5px 5.3px rgba(0, 0, 0, 0.28),
+      0 7.3px 11px rgba(0, 0, 0, 0.346), 0 20px 30px rgba(0, 0, 0, 0.5);
+  }
       }
 
       #loginForm h1 {
@@ -118,47 +130,50 @@
         google.script.run.withSuccessHandler(displayParts).getPartsData(team);
       }
 
-      // Display the parts data for the selected team
-      function displayParts(data) {
-        var table = document.getElementById('partsTable');
-        table.innerHTML = ''; // Clear the table before loading new data
-        
-        // Add header row
-        var headerRow = table.insertRow();
-        headerRow.insertCell(0).innerHTML = '<strong>Part</strong>';
-        headerRow.insertCell(1).innerHTML = '<strong>Category</strong>';
-        headerRow.insertCell(2).innerHTML = '<strong>In Use</strong>';
-        headerRow.insertCell(3).innerHTML = '<strong>Update</strong>';
-        
-        data.forEach(function(row) {
-          var newRow = table.insertRow();
-          var partCell = newRow.insertCell(0);
-          var categoryCell = newRow.insertCell(1);
-          var usedCell = newRow.insertCell(2);
-          var updateCell = newRow.insertCell(3);
-          
-          partCell.innerHTML = row.part;
-          categoryCell.innerHTML = row.category;
-          usedCell.innerHTML = row.used;
-          
-          var input = document.createElement('input');
-          input.type = 'number';
-          input.value = row.used;
-          input.setAttribute('data-part', row.part);
-          
-          var updateButton = document.createElement('button');
-          updateButton.innerHTML = 'Update';
-          updateButton.onclick = function() {
-            var part = input.getAttribute('data-part');
-            var newCount = input.value;
-            google.script.run.updatePartsData(team, part, newCount);
-            loadParts(); // Reload parts after update
-          };
-          
-          updateCell.appendChild(input);
-          updateCell.appendChild(updateButton);
-        });
-      }
+// Display the parts data for the selected team
+function displayParts(data) {
+  var table = document.getElementById('partsTable');
+  table.innerHTML = ''; // Clear the table before loading new data
+  
+  // Add header row
+  var headerRow = table.insertRow();
+  headerRow.insertCell(0).innerHTML = '<strong>Part</strong>';
+  headerRow.insertCell(1).innerHTML = '<strong>Category</strong>';
+  headerRow.insertCell(2).innerHTML = '<strong>In Use</strong>';
+  headerRow.insertCell(3).innerHTML = '<strong>Update</strong>';
+  
+  data.forEach(function(row) {
+    var newRow = table.insertRow();
+    var partCell = newRow.insertCell(0);
+    var categoryCell = newRow.insertCell(1);
+    var usedCell = newRow.insertCell(2);
+    var updateCell = newRow.insertCell(3);
+    
+    partCell.innerHTML = row.part;
+    categoryCell.innerHTML = row.category;
+    usedCell.innerHTML = row.used;
+    
+    var input = document.createElement('input');
+    input.type = 'number';
+    input.value = row.used;
+    input.setAttribute('data-part', row.part);
+    
+    // Create a function to handle the update when the input loses focus
+    function handleUpdate() {
+      var part = input.getAttribute('data-part');
+      var newCount = input.value;
+      google.script.run.updatePartsData(team, part, newCount);
+      loadParts(); // Reload parts after update
+    }
+    
+    // Attach event listeners to the input
+    input.addEventListener('blur', handleUpdate);
+    input.addEventListener('change', handleUpdate); // Handle changes if the user presses enter or changes the value
+    
+    updateCell.appendChild(input);
+  });
+}
+
 
       // Function to filter parts by category and part name
       function filterParts() {
@@ -181,7 +196,7 @@
   </head>
   <body class="body"> <!-- Add class 'body' to body element -->
     <!-- Login Form -->
-    <div id="loginForm">
+    <div class="card" id="loginForm">
       <h1 class="login">Login</h1>
       <input type="text" id="teamLetter" placeholder="Enter team letter" required>
       <br>
@@ -191,7 +206,7 @@
     </div>
 
     <!-- Content Section (hidden until login) -->
-    <div id="content" style="display: none;">
+    <div class="card-list" id="content" style="display: none;">
       <h1>Parts Tracker</h1>
       
       <!-- Search by part name -->
@@ -218,5 +233,282 @@
         <!-- Data rows will be dynamically inserted here -->
       </table>
     </div>
+
+
+
+
+    <style>
+        :root {
+        --color-bg1: rgb(8, 10, 15);
+        --color-bg2: rgb(0, 17, 32);
+        --color1: 18, 113, 255;
+        --color2: 107, 74, 255;
+        --color3: 100, 100, 255;
+        --color4: 50, 160, 220;
+        --color5: 80, 47, 122;
+        --color-interactive: 140, 100, 255;
+        --circle-size: 80%;
+        --blending: hard-light;
+      }
+      
+      * {
+        margin: 0;
+        padding: 0;
+        outline: none;
+        list-style: none;
+        text-decoration: none;
+        box-sizing: border-box;
+        color: #FFF;
+        background: transparent;
+        border: none;
+      }
+      
+      
+      
+      .card-list {
+        position: absolute;
+        z-index: 10;
+        left: 15%;
+        right: 15%;
+        transform: translate(0%, 1.5%);
+        user-select: none;
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        border-radius: 8px;
+        box-shadow: 0 4px 90px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+
+
+
+      .card {
+        position: absolute;
+        z-index: 10;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        user-select: none;
+        max-width: 600px;
+        padding: 48px;
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        border-radius: 8px;
+        box-shadow: 0 4px 90px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+      .card:before {
+        content: "";
+        position: absolute;
+        z-index: 2;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: white;
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, white 34%, white 89%, rgba(255, 255, 255, 0) 100%);
+        opacity: 0.3;
+        filter: blur(0.5px);
+        mix-blend-mode: hard-light;
+      }
+      .card .noise {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        z-index: 1;
+        opacity: 0.1;
+      }
+      .card .content {
+        position: relative;
+        z-index: 2;
+        text-shadow: -3px 0px 2px rgba(0, 0, 0, 0.1);
+      }
+      
+      
+      @keyframes moveInCircle {
+        0% {
+          transform: rotate(0deg);
+        }
+        50% {
+          transform: rotate(180deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      @keyframes moveVertical {
+        0% {
+          transform: translateY(-50%);
+        }
+        50% {
+          transform: translateY(50%);
+        }
+        100% {
+          transform: translateY(-50%);
+        }
+      }
+      @keyframes moveHorizontal {
+        0% {
+          transform: translateX(-50%) translateY(-10%);
+        }
+        50% {
+          transform: translateX(50%) translateY(10%);
+        }
+        100% {
+          transform: translateX(-50%) translateY(-10%);
+        }
+      }
+      .gradient-bg {
+        width: 100vw;
+        height: 100vh;
+        position: fixed;
+        overflow: hidden;
+        background: linear-gradient(40deg, var(--color-bg1), var(--color-bg2));
+        top: 0;
+        left: 0;
+      }
+      .gradient-bg .svgBlur {
+        display: none;
+      }
+      .gradient-bg .noiseBg {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        mix-blend-mode: soft-light;
+        opacity: 0.3;
+      }
+      .gradient-bg .gradients-container {
+        filter: url(#goo) blur(40px);
+        width: 100%;
+        height: 100%;
+      }
+      .gradient-bg .g1 {
+        position: absolute;
+        background: radial-gradient(circle at center, rgba(var(--color1), 0.8) 0, rgba(var(--color1), 0) 50%) no-repeat;
+        mix-blend-mode: var(--blending);
+        width: var(--circle-size);
+        height: var(--circle-size);
+        top: calc(50% - var(--circle-size) / 2);
+        left: calc(50% - var(--circle-size) / 2);
+        transform-origin: center center;
+        animation: moveVertical 30s ease infinite;
+        opacity: 1;
+      }
+      .gradient-bg .g2 {
+        position: absolute;
+        background: radial-gradient(circle at center, rgba(var(--color2), 0.8) 0, rgba(var(--color2), 0) 50%) no-repeat;
+        mix-blend-mode: var(--blending);
+        width: var(--circle-size);
+        height: var(--circle-size);
+        top: calc(50% - var(--circle-size) / 2);
+        left: calc(50% - var(--circle-size) / 2);
+        transform-origin: calc(50% - 400px);
+        animation: moveInCircle 20s reverse infinite;
+        opacity: 1;
+      }
+      .gradient-bg .g3 {
+        position: absolute;
+        background: radial-gradient(circle at center, rgba(var(--color3), 0.8) 0, rgba(var(--color3), 0) 50%) no-repeat;
+        mix-blend-mode: var(--blending);
+        width: var(--circle-size);
+        height: var(--circle-size);
+        top: calc(50% - var(--circle-size) / 2 + 200px);
+        left: calc(50% - var(--circle-size) / 2 - 500px);
+        transform-origin: calc(50% + 400px);
+        animation: moveInCircle 40s linear infinite;
+        opacity: 1;
+      }
+      .gradient-bg .g4 {
+        position: absolute;
+        background: radial-gradient(circle at center, rgba(var(--color4), 0.8) 0, rgba(var(--color4), 0) 50%) no-repeat;
+        mix-blend-mode: var(--blending);
+        width: var(--circle-size);
+        height: var(--circle-size);
+        top: calc(50% - var(--circle-size) / 2);
+        left: calc(50% - var(--circle-size) / 2);
+        transform-origin: calc(50% - 200px);
+        animation: moveHorizontal 40s ease infinite;
+        opacity: 0.7;
+      }
+      .gradient-bg .g5 {
+        position: absolute;
+        background: radial-gradient(circle at center, rgba(var(--color5), 0.8) 0, rgba(var(--color5), 0) 50%) no-repeat;
+        mix-blend-mode: var(--blending);
+        width: calc(var(--circle-size) * 2);
+        height: calc(var(--circle-size) * 2);
+        top: calc(50% - var(--circle-size));
+        left: calc(50% - var(--circle-size));
+        transform-origin: calc(50% - 800px) calc(50% + 200px);
+        animation: moveInCircle 20s ease infinite;
+        opacity: 1;
+      }
+      .gradient-bg .interactive {
+        position: absolute;
+        background: radial-gradient(circle at center, rgba(var(--color-interactive), 0.8) 0, rgba(var(--color-interactive), 0) 50%) no-repeat;
+        mix-blend-mode: var(--blending);
+        width: 100%;
+        height: 100%;
+        top: -50%;
+        left: -50%;
+        opacity: 0.7;
+      }
+      </style>
+      <div class="gradient-bg">
+          <filter id='noiseFilterBg'>
+            <feTurbulence 
+                          type='fractalNoise'
+                          baseFrequency='0.6'
+                          stitchTiles='stitch' />
+          </filter>
+        </svg>
+          <defs>
+            <filter id="goo">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+              <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
+              <feBlend in="SourceGraphic" in2="goo" />
+            </filter>
+          </defs>
+        </svg>
+        <div class="gradients-container">
+          <div class="g1"></div>
+          <div class="g2"></div>
+          <div class="g3"></div>
+          <div class="g4"></div>
+          <div class="g5"></div>
+          <div class="interactive"></div>
+        </div>
+      </div>
+        <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const interBubble = document.querySelector('.interactive');
+        let curX = 0;
+        let curY = 0;
+        let tgX = 0;
+        let tgY = 0;
+        const move = () => {
+          curX += (tgX - curX) / 20;
+          curY += (tgY - curY) / 20;
+          interBubble.style.transform = `translate(${Math.round(curX)}px, ${Math.round(curY)}px)`;
+          requestAnimationFrame(move);
+        };
+        window.addEventListener('mousemove', event => {
+          tgX = event.clientX;
+          tgY = event.clientY;
+        });
+        move();
+      });
+        </script>
+      
+
+
+
+
+
+
   </body>
 </html>
