@@ -122,6 +122,14 @@
       function displayParts(data) {
         var table = document.getElementById('partsTable');
         table.innerHTML = ''; // Clear the table before loading new data
+        
+        // Add header row
+        var headerRow = table.insertRow();
+        headerRow.insertCell(0).innerHTML = '<strong>Part</strong>';
+        headerRow.insertCell(1).innerHTML = '<strong>Category</strong>';
+        headerRow.insertCell(2).innerHTML = '<strong>In Use</strong>';
+        headerRow.insertCell(3).innerHTML = '<strong>Update</strong>';
+        
         data.forEach(function(row) {
           var newRow = table.insertRow();
           var partCell = newRow.insertCell(0);
@@ -158,7 +166,7 @@
         var category = document.getElementById('categorySelect').value;
         var rows = document.getElementById('partsTable').rows;
         
-        for (var i = 0; i < rows.length; i++) {
+        for (var i = 1; i < rows.length; i++) { // Start from 1 to skip the header row
           var partName = rows[i].cells[0].innerHTML.toLowerCase();
           var partCategory = rows[i].cells[1].innerHTML;
           
@@ -206,13 +214,8 @@
       <h2 id="teamHeader"></h2>
       
       <table border="1" id="partsTable">
-        <tr>
-          <th>Part</th>
-          <th>Category</th>
-          <th>Used</th>
-          <th>Update</th>
-        </tr>
-        <!-- Rows will be dynamically inserted here -->
+        <!-- Header row will be dynamically inserted here -->
+        <!-- Data rows will be dynamically inserted here -->
       </table>
     </div>
   </body>
