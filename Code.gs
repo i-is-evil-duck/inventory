@@ -30,20 +30,22 @@ function validateCredentials(teamLetter, password) {
   return credentials[teamLetter] === password;
 }
 
-// Other functions remain the same
+// Function to fetch parts data including part-id
 function getPartsData(team) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(team);
   if (!sheet) {
     return [];
   }
   
-  var partsRange = sheet.getRange('C2:C');
-  var categoryRange = sheet.getRange('D2:D');
-  var usedRange = sheet.getRange('E2:E');
+  var partsRange = sheet.getRange('C2:C'); // Column C for part names
+  var categoryRange = sheet.getRange('D2:D'); // Column D for categories
+  var usedRange = sheet.getRange('E2:E'); // Column E for "In Use"
+  var partIdRange = sheet.getRange('B2:B'); // Column B for part IDs
   
   var parts = partsRange.getValues();
   var categories = categoryRange.getValues();
   var used = usedRange.getValues();
+  var partIds = partIdRange.getValues(); // Fetch part IDs
   
   var data = [];
   
@@ -52,6 +54,7 @@ function getPartsData(team) {
       data.push({
         part: parts[i][0],
         category: categories[i][0],
+        partId: partIds[i][0], // Include part ID
         used: used[i][0]
       });
     }
@@ -60,18 +63,19 @@ function getPartsData(team) {
   return data;
 }
 
+// Function to update parts data
 function updatePartsData(team, partName, newUsedCount) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(team);
   if (!sheet) {
     return 'Team not found';
   }
   
-  var partsRange = sheet.getRange('C2:C');
+  var partsRange = sheet.getRange('C2:C'); // Column C for part names
   var parts = partsRange.getValues();
   
   for (var i = 0; i < parts.length; i++) {
     if (parts[i][0] === partName) {
-      sheet.getRange('E' + (i + 2)).setValue(newUsedCount);
+      sheet.getRange('E' + (i + 2)).setValue(newUsedCount); // Update "In Use"
       return 'Updated successfully';
     }
   }
