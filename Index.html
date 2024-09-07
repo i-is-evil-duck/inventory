@@ -139,19 +139,19 @@ function displayParts(data) {
   var headerRow = table.insertRow();
   headerRow.insertCell(0).innerHTML = '<strong>Part</strong>';
   headerRow.insertCell(1).innerHTML = '<strong>Category</strong>';
-  headerRow.insertCell(2).innerHTML = '<strong>In Use</strong>';
+  headerRow.insertCell(2).innerHTML = '<strong>Part ID</strong>'; // Updated header
   headerRow.insertCell(3).innerHTML = '<strong>Update</strong>';
   
   data.forEach(function(row) {
     var newRow = table.insertRow();
     var partCell = newRow.insertCell(0);
     var categoryCell = newRow.insertCell(1);
-    var usedCell = newRow.insertCell(2);
+    var partIdCell = newRow.insertCell(2); // Updated cell
     var updateCell = newRow.insertCell(3);
     
     partCell.innerHTML = row.part;
     categoryCell.innerHTML = row.category;
-    usedCell.innerHTML = row.used;
+    partIdCell.innerHTML = row.partId; // Display part ID
     
     var input = document.createElement('input');
     input.type = 'number';
@@ -173,6 +173,7 @@ function displayParts(data) {
     updateCell.appendChild(input);
   });
 }
+
 
 
       // Function to filter parts by category and part name
