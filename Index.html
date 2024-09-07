@@ -8,7 +8,6 @@
         font-family: Arial, sans-serif;
         height: 100vh;
         background-color: #f4f4f4;
-        
       }
       table {
         width: 100%;
@@ -80,18 +79,14 @@
         padding: 20px;
       }
 
-
       .body {
         font-family: Arial, sans-serif;
-        margin: 20%;
+        margin: 0;
         padding: 0;
         display: flex;
         justify-content: center;
         align-items: center;
       }
-
-
-
     </style>
     <script>
       var team; // Store the team letter for later use
@@ -106,6 +101,10 @@
             team = teamLetter; // Save the team letter
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('content').style.display = 'block';
+            
+            // Remove the body class
+            document.body.classList.remove('body');
+            
             loadParts(); // Load parts data for the team
           } else {
             alert('Invalid team letter or password');
@@ -172,18 +171,17 @@
       }
     </script>
   </head>
-  <body>
+  <body class="body"> <!-- Add class 'body' to body element -->
     <!-- Login Form -->
-  <div class="body">
     <div id="loginForm">
-      <h1 class=login>Login</h1>
+      <h1 class="login">Login</h1>
       <input type="text" id="teamLetter" placeholder="Enter team letter" required>
       <br>
       <input type="password" id="password" placeholder="Enter password" required>
       <br>
       <button onclick="handleLogin()">Login</button>
-  </div>
-  </div>
+    </div>
+
     <!-- Content Section (hidden until login) -->
     <div id="content" style="display: none;">
       <h1>Parts Tracker</h1>
