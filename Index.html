@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      /* Optional styling for a cleaner layout */
+      body {
+        font-family: Arial, sans-serif;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th, td {
+        padding: 10px;
+        text-align: left;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+      input, select {
+        margin: 10px 0;
+        padding: 5px;
+      }
+    </style>
+    <script>
+      var team; // Store the team letter for later use
+
+      // Function to handle login
+      function handleLogin() {
+        var teamLetter = document.getElementById('teamLetter').value.trim();
+        var password = document.getElementById('password').value.trim();
+
+        google.script.run.withSuccessHandler(function(isValid) {
+          if (isValid) {
+            team = teamLetter; // Save the team letter
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+            loadParts(); // Load parts data for the team
+          } else {
+            alert('Invalid team letter or password');
+          }
+        }).validateCredentials(teamLetter, password);
+      }
+
+      // Function to load parts data after login
+      function loadParts() {
+        if (!team) return; // Ensure team is defined
+        google.script.run.withSuccessHandler(displayParts).getPartsData(team);
+      }
+
+      // Display the parts data for the selected team
+      function displayParts(data) {
+        var table = document.getElementById('partsTable');
+        table.innerHTML = ''; // Clear the table before loading new data
+        data.forEach(function(row) {
+          var newRow = table.insertRow();
+          var partCell = newRow.insertCell(0);
+          var categoryCell = newRow.insertCell(1);
+          var usedCell = newRow.insertCell(2);
+          var updateCell = newRow.insertCell(3);
+          
+          partCell.innerHTML = row.part;
+          categoryCell.innerHTML = row.category;
+          usedCell.innerHTML = row.used;
+          
+          var input = document.createElement('input');
+          input.type = 'number';
+          input.value = row.used;
+          input.setAttribute('data-part', row.part);
+          
+          var updateButton = document.createElement('button');
+          updateButton.innerHTML = 'Update';
+          updateButton.onclick = function() {
+            var part = input.getAttribute('data-part');
+            var newCount = input.value;
+            google.script.run.updatePartsData(team, part, newCount);
+            loadParts(); // Reload parts after update
+          };
+          
+          updateCell.appendChild(input);
+          updateCell.appendChild(updateButton);
+        });
+      }
+
+      // Function to filter parts by category and part name
+      function filterParts() {
+        var searchTerm = document.getElementById('searchBox').value.toLowerCase();
+        var category = document.getElementById('categorySelect').value;
+        var rows = document.getElementById('partsTable').rows;
+        
+        for (var i = 0; i < rows.length; i++) {
+          var partName = rows[i].cells[0].innerHTML.toLowerCase();
+          var partCategory = rows[i].cells[1].innerHTML;
+          
+          // Filter by search term and category
+          var matchName = partName.includes(searchTerm);
+          var matchCategory = category === '' || partCategory === category;
+          
+          rows[i].style.display = (matchName && matchCategory) ? '' : 'none';
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <!-- Login Form -->
+    <div id="loginForm">
+      <h1>Login</h1>
+      <label for="teamLetter">Team Letter: </label>
+      <input type="text" id="teamLetter" placeholder="Enter team letter" required>
+      <br>
+      <label for="password">Password: </label>
+      <input type="password" id="password" placeholder="Enter password" required>
+      <br>
+      <button onclick="handleLogin()">Login</button>
+    </div>
+    
+    <!-- Content Section (hidden until login) -->
+    <div id="content" style="display: none;">
+      <h1>Parts Tracker</h1>
+      
+      <!-- Search by part name -->
+      <input type="text" id="searchBox" placeholder="Search by part name" onkeyup="filterParts()">
+  
+      <!-- Sort by part category -->
+      <label for="categorySelect">Filter by Category: </label>
+      <select id="categorySelect" onchange="filterParts()">
+        <option value="">All Categories</option>
+        <option value="Electronics">Electronics</option>
+        <option value="Sensor">Sensor</option>
+        <option value="Motion">Motion</option>
+        <option value="Structure">Structure</option>
+        <option value="Wheel">Wheel</option>
+        <option value="Hardware">Hardware</option>
+        <option value="Pneumatics">Pneumatics</option>
+        <option value="Tools">Tools</option>
+      </select>
+  
+      <h2 id="teamHeader"></h2>
+      
+      <table border="1" id="partsTable">
+        <tr>
+          <th>Part</th>
+          <th>Category</th>
+          <th>Used</th>
+          <th>Update</th>
+        </tr>
+        <!-- Rows will be dynamically inserted here -->
+      </table>
+    </div>
+  </body>
+</html>
