@@ -6,6 +6,9 @@
       /* Optional styling for a cleaner layout */
       body {
         font-family: Arial, sans-serif;
+        height: 100vh;
+        background-color: #f4f4f4;
+        
       }
       table {
         width: 100%;
@@ -22,6 +25,73 @@
         margin: 10px 0;
         padding: 5px;
       }
+      
+      #loginForm {
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 300px;
+        text-align: center;
+      }
+
+      #loginForm h1 {
+        margin: 0 0 20px;
+        font-size: 24px;
+        color: #333;
+      }
+
+      #loginForm label {
+        display: block;
+        margin: 10px 0 5px;
+        font-weight: bold;
+        color: #555;
+      }
+
+      #loginForm input {
+        width: calc(100% - 20px);
+        padding: 10px;
+        margin: 5px 0 20px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 16px;
+        box-sizing: border-box;
+      }
+
+      #loginForm button {
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-radius: 4px;
+        background-color: #007bff;
+        color: #ffffff;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      #loginForm button:hover {
+        background-color: #0056b3;
+      }
+
+      /* Content section styling */
+      #content {
+        display: none;
+        padding: 20px;
+      }
+
+
+      .body {
+        font-family: Arial, sans-serif;
+        margin: 20%;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+
+
     </style>
     <script>
       var team; // Store the team letter for later use
@@ -104,17 +174,16 @@
   </head>
   <body>
     <!-- Login Form -->
+  <div class="body">
     <div id="loginForm">
-      <h1>Login</h1>
-      <label for="teamLetter">Team Letter: </label>
+      <h1 class=login>Login</h1>
       <input type="text" id="teamLetter" placeholder="Enter team letter" required>
       <br>
-      <label for="password">Password: </label>
       <input type="password" id="password" placeholder="Enter password" required>
       <br>
       <button onclick="handleLogin()">Login</button>
-    </div>
-    
+  </div>
+  </div>
     <!-- Content Section (hidden until login) -->
     <div id="content" style="display: none;">
       <h1>Parts Tracker</h1>
