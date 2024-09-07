@@ -2,29 +2,44 @@ function doGet() {
   return HtmlService.createHtmlOutputFromFile('Index');
 }
 
-// Hardcoded credentials (for example purposes, consider using a more secure method)
-var credentials = {
-  'A': 'passwordA', // Team A's password
-  'B': 'passwordB', // Team B's password
-  'C': 'passwordC'  // Team C's password
-  // Add more teams and passwords as needed
-};
+// Function to fetch credentials from the "Admin Page" sheet
+function getCredentialsFromSheet() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Admin Page');
+  if (!sheet) {
+    throw new Error('Admin Page sheet not found');
+  }
+  
+  var data = sheet.getRange('A2:B').getValues(); // Assuming data starts from row 2
+  var credentials = {};
+  
+  data.forEach(function(row) {
+    var teamLetter = row[0];
+    var password = row[1];
+    
+    if (teamLetter && password) {
+      credentials[teamLetter] = password;
+    }
+  });
+  
+  return credentials;
+}
 
 // Function to validate team letter and password
 function validateCredentials(teamLetter, password) {
+  var credentials = getCredentialsFromSheet();
   return credentials[teamLetter] === password;
 }
 
-// Function to fetch part data from the sheet based on the selected team
+// Other functions remain the same
 function getPartsData(team) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(team);  // Get the sheet for the selected team
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(team);
   if (!sheet) {
     return [];
   }
   
-  var partsRange = sheet.getRange('C2:C'); // Parts are listed in column C starting from row 2
-  var categoryRange = sheet.getRange('D2:D'); // Category is listed in column D starting from row 2
-  var usedRange = sheet.getRange('E2:E');  // Quantities are listed in column E starting from row 2
+  var partsRange = sheet.getRange('C2:C');
+  var categoryRange = sheet.getRange('D2:D');
+  var usedRange = sheet.getRange('E2:E');
   
   var parts = partsRange.getValues();
   var categories = categoryRange.getValues();
@@ -33,7 +48,7 @@ function getPartsData(team) {
   var data = [];
   
   for (var i = 0; i < parts.length; i++) {
-    if (parts[i][0] != '') { // Only push non-empty rows
+    if (parts[i][0] != '') {
       data.push({
         part: parts[i][0],
         category: categories[i][0],
@@ -42,12 +57,11 @@ function getPartsData(team) {
     }
   }
   
-  return data;  // Return the parts and usage data
+  return data;
 }
 
-// Function to update the number of parts used for the selected team
 function updatePartsData(team, partName, newUsedCount) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(team);  // Get the sheet for the selected team
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(team);
   if (!sheet) {
     return 'Team not found';
   }
