@@ -1,6 +1,8 @@
-function doGet() {
-  return HtmlService.createHtmlOutputFromFile('Index');
+function doGet(request) {
+  return HtmlService.createTemplateFromFile('Index').evaluate()
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
+
 
 // Function to fetch credentials from the "Admin Page" sheet
 function getCredentialsFromSheet() {
