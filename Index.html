@@ -3,6 +3,10 @@
   <head>
     <base target="_top">
     <style>
+
+
+
+      /* Optional styling for a cleaner layout */
       body {
         font-family: Arial, sans-serif;
       
@@ -142,45 +146,64 @@
 function displayParts(data) {
   var table = document.getElementById('partsTable');
   table.innerHTML = ''; // Clear the table before loading new data
-  
+
   // Add header row
   var headerRow = table.insertRow();
   headerRow.insertCell(0).innerHTML = '<strong>Part</strong>';
   headerRow.insertCell(1).innerHTML = '<strong>Category</strong>';
   headerRow.insertCell(2).innerHTML = '<strong>Part ID</strong>'; // Updated header
   headerRow.insertCell(3).innerHTML = '<strong>Update</strong>';
-  
+
   data.forEach(function(row) {
     var newRow = table.insertRow();
     var partCell = newRow.insertCell(0);
     var categoryCell = newRow.insertCell(1);
     var partIdCell = newRow.insertCell(2); // Updated cell
     var updateCell = newRow.insertCell(3);
-    
+
     partCell.innerHTML = row.part;
     categoryCell.innerHTML = row.category;
     partIdCell.innerHTML = row.partId; // Display part ID
-    
+
     var input = document.createElement('input');
     input.type = 'number';
     input.value = row.used;
     input.setAttribute('data-part', row.part);
-    
-    // Create a function to handle the update when the input loses focus
-    function handleUpdate() {
-      var part = input.getAttribute('data-part');
-      var newCount = input.value;
-      google.script.run.updatePartsData(team, part, newCount);
-      loadParts(); // Reload parts after update
-    }
-    
+    input.setAttribute('min', '0'); // Set the minimum value
+    input.setAttribute('max', '100'); // Set the maximum value
+
+function handleUpdate() {
+  var part = input.getAttribute('data-part');
+  var newCount = parseFloat(input.value);
+
+  // Validate the value to be within min and max range
+  var minValue = parseFloat(input.getAttribute('min'));
+  var maxValue = parseFloat(input.getAttribute('max'));
+
+  if (newCount < minValue) {
+    newCount = minValue;
+    input.value = newCount;
+  } else if (newCount > maxValue) {
+    newCount = maxValue;
+    input.value = newCount;
+  }
+
+  google.script.run.updatePartsData(team, part, newCount);
+  loadParts(); // Reload parts after update
+}
+
+
     // Attach event listeners to the input
     input.addEventListener('blur', handleUpdate);
     input.addEventListener('change', handleUpdate); // Handle changes if the user presses enter or changes the value
-    
+
     updateCell.appendChild(input);
   });
 }
+
+
+
+
       // Function to filter parts by category and part name
       function filterParts() {
         var searchTerm = document.getElementById('searchBox').value.toLowerCase();
@@ -239,6 +262,10 @@ function displayParts(data) {
         <!-- Data rows will be dynamically inserted here -->
       </table>
     </div>
+
+
+
+
     <style>
         :root {
         --color-bg1: rgb(8, 10, 15);
