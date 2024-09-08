@@ -21,29 +21,47 @@
     table {
       width: 100%;
       border-collapse: collapse;
+      table-layout: fixed; /* Make sure the table respects the defined widths */
     }
     th, td {
       padding: 10px;
       text-align: left;
       border: 1px solid rgba(100, 100, 100, 0.397);
+      white-space: nowrap; /* Prevent text wrapping */
     }
     th {
       background-color: #444;
     }
-    input, select {
-      margin: 10px 0;
-      padding: 5px;
+
+    /* Control column widths separately using nth-child selectors */
+    td:nth-child(1), th:nth-child(1) { /* ID column */
+      width: 90px;
     }
-    .dropdown {
-      background-color: transparent;
-      color: white;
-      border: 1px solid white;
-      border-radius: 8px;
+
+    td:nth-child(2), th:nth-child(2) { /* Item Name column */
+      width: 325px;
     }
-    .dropdown option {
-      background-color: rgb(44, 44, 71);
-      color: white;
+
+    td:nth-child(3), th:nth-child(3) { /* Type column */
+      width: 120px;
     }
+
+    td:nth-child(4), th:nth-child(4) { /* Stock column */
+      width: 65px;
+    }
+
+    td:nth-child(5), th:nth-child(5) { /* In-Use column */
+      width: 66px;
+    }
+
+    td:nth-child(6), th:nth-child(6) { /* Status column */
+      width: 80px;
+    }
+
+    td:nth-child(7), th:nth-child(7) { /* Notes column */
+      width: 200px;
+    }
+
     #content {
       padding: 20px;
     }
@@ -80,62 +98,7 @@
     #loginForm button:hover {
       background-color: #0056b3;
     }
-    .card-list {
-      position: absolute;
-      z-index: 10;
-      left: 15%;
-      right: 15%;
-      transform: translate(0%, 1.5%);
-      user-select: none;
-      -webkit-backdrop-filter: blur(10px);
-      backdrop-filter: blur(10px);
-      border-radius: 8px;
-      box-shadow: 0 4px 90px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-    }
-    .card {
-      position: absolute;
-      z-index: 10;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      user-select: none;
-      max-width: 600px;
-      padding: 48px;
-      -webkit-backdrop-filter: blur(10px);
-      backdrop-filter: blur(10px);
-      border-radius: 8px;
-      box-shadow: 0 4px 90px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-    }
-    .card:before {
-      content: "";
-      position: absolute;
-      z-index: 2;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 2px;
-      background: white;
-      background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, white 34%, white 89%, rgba(255, 255, 255, 0) 100%);
-      opacity: 0.3;
-      filter: blur(0.5px);
-      mix-blend-mode: hard-light;
-    }
-    .card .noise {
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 100%;
-      width: 100%;
-      z-index: 1;
-      opacity: 0.1;
-    }
-    .card .content {
-      position: relative;
-      z-index: 2;
-      text-shadow: -3px 0px 2px rgba(0, 0, 0, 0.1);
-    }
+
   </style>
 </head>
 <body>
@@ -154,7 +117,7 @@
   </div>
 
   <!-- Inventory Table -->
-  <div id="content" class="card-list">
+  <div id="content">
     <h2>Inventory Table</h2>
     <table id="inventoryTable">
       <thead>
