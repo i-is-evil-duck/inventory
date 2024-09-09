@@ -3,9 +3,9 @@ function doGet(request) {
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
-// Function to fetch parts data including part-id (for U_Inventory tab)
+// Function to fetch parts data including part-id (for R_Inventory tab)
 function getPartsData() {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('U_Inventory');
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('R_Inventory');
   if (!sheet) {
     return [];
   }
