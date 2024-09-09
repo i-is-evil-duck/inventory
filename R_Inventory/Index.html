@@ -21,12 +21,12 @@
                       }
                     </style>
                     <script>
-                      // Automatically load parts for the U_Inventory tab
+                      // Automatically load parts for the R_Inventory tab
                       function loadParts() {
                         google.script.run.withSuccessHandler(displayParts).getPartsData();
                       }
 
-                      // Display the parts data for U_Inventory
+                      // Display the parts data for R_Inventory
                       function displayParts(data) {
                         var table = document.getElementById('partsTable');
                         table.innerHTML = ''; // Clear the table before loading new data
@@ -67,9 +67,9 @@
       }
     </script>
                   </head>
-                  <body onload="loadParts()"> <!-- Load U_Inventory data on page load -->
+                  <body onload="loadParts()"> <!-- Load R_Inventory data on page load -->
                 <div class="card">
-                    <h1>U_Inventory Parts Tracker</h1>
+                    <h1>R_Inventory Parts Tracker</h1>
 
                     <!-- Search by part name -->
                     <input type="text" id="searchBox" placeholder="Search by part name" onkeyup="filterParts()">
