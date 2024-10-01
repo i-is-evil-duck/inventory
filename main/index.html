@@ -113,7 +113,6 @@
       <br>
       <button onclick="handleLogin()">Login</button>
     </div>
-    <div class="noise"></div>
   </div>
 
   <!-- Inventory Table -->
@@ -137,7 +136,6 @@
     </table>
   </div>
 
-  <!-- Login Button -->
   <button id="loginButton" onclick="showLogin()">Login</button>
 
   <script>
@@ -156,23 +154,22 @@
 
         // ID (Non-editable)
         var idCell = document.createElement('td');
-        idCell.textContent = row[0]; // Column B (ID)
+        idCell.textContent = row[0];
         tr.appendChild(idCell);
 
         // Item Name (Non-editable)
         var itemNameCell = document.createElement('td');
-        itemNameCell.textContent = row[1]; // Column C (Item name)
+        itemNameCell.textContent = row[1];
         tr.appendChild(itemNameCell);
 
         // Type (Dropdown)
         var typeCell = document.createElement('td');
         var typeSelect = document.createElement('select');
-        typeSelect.className = 'dropdown'; // Apply the dropdown class
         ["Electronics", "Sensor", "Motion", "Structure", "Wheel", "Hardware", "Pneumatics", "Tools"].forEach(function(optionValue) {
           var option = document.createElement('option');
           option.value = optionValue;
           option.text = optionValue;
-          if (optionValue === row[2]) option.selected = true; // Column D (Type)
+          if (optionValue === row[2]) option.selected = true;
           typeSelect.appendChild(option);
         });
         typeSelect.disabled = !loggedIn;
@@ -183,25 +180,24 @@
         var stockCell = document.createElement('td');
         var stockInput = document.createElement('input');
         stockInput.type = 'number';
-        stockInput.value = row[3]; // Column E (Stock)
+        stockInput.value = row[3];
         stockInput.disabled = !loggedIn;
         stockCell.appendChild(stockInput);
         tr.appendChild(stockCell);
 
         // In-Use (Non-editable)
         var inUseCell = document.createElement('td');
-        inUseCell.textContent = row[4]; // Column F (In-Use)
+        inUseCell.textContent = row[4];
         tr.appendChild(inUseCell);
 
         // Status (Dropdown)
         var statusCell = document.createElement('td');
         var statusSelect = document.createElement('select');
-        statusSelect.className = 'dropdown'; // Apply the dropdown class
         ["In stock", "Fully in use", "Re-stock needed", "Sold out", "Not needed", "Restocking"].forEach(function(optionValue) {
           var option = document.createElement('option');
           option.value = optionValue;
           option.text = optionValue;
-          if (optionValue === row[16]) option.selected = true; // Column R (Status)
+          if (optionValue === row[16]) option.selected = true;
           statusSelect.appendChild(option);
         });
         statusSelect.disabled = !loggedIn;
@@ -210,19 +206,19 @@
 
         // Notes (Non-editable)
         var notesCell = document.createElement('td');
-        notesCell.textContent = row[18]; // Column T (Notes)
+        notesCell.textContent = row[18];
         tr.appendChild(notesCell);
 
         // Add event listeners to save changes (only when logged in)
         if (loggedIn) {
           stockInput.addEventListener('change', function() {
-            google.script.run.updateInventory(index + 1, stockInput.value, typeSelect.value, statusSelect.value); // Index + 1 to match row number
+            google.script.run.updateInventory(index + 1, stockInput.value, typeSelect.value, statusSelect.value);
           });
           typeSelect.addEventListener('change', function() {
-            google.script.run.updateInventory(index + 1, stockInput.value, typeSelect.value, statusSelect.value); // Index + 1 to match row number
+            google.script.run.updateInventory(index + 1, stockInput.value, typeSelect.value, statusSelect.value);
           });
           statusSelect.addEventListener('change', function() {
-            google.script.run.updateInventory(index + 1, stockInput.value, typeSelect.value, statusSelect.value); // Index + 1 to match row number
+            google.script.run.updateInventory(index + 1, stockInput.value, typeSelect.value, statusSelect.value);
           });
         }
 
