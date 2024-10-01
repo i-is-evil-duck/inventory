@@ -3,28 +3,50 @@ function doGet(request) {
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
+// Fetch inventory data
 function getInventoryData() {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Inventory');
-  // Fetch data from columns B to T starting from row 2
-  var dataRange = sheet.getRange(2, 2, sheet.getLastRow() - 1, 18); // Columns B (2) to T (20), 18 columns in total
+  var dataRange = sheet.getRange(2, 2, sheet.getLastRow() - 1, 18);
   var data = dataRange.getValues();
-  return data; // Returns rows from column B (ID) to column T (Notes)
+  return data;
 }
 
+// Validate login credentials for multiple users
 function validateCredentials(username, password) {
-  // Simple validation, replace with your actual validation
-  return username === "admin" && password === "password";
+  var validUsers = {
+    'admin': 'glen42151',
+    'arek': 'is-a-twink',
+    'mrz': 'dagoat' // Convert to lowercase to make it case-insensitive
+  };
+
+  username = username.toLowerCase(); // Make mrZ case-insensitive
+  if (validUsers[username] && validUsers[username] === password) {
+    logLogin(username, true); // Log the successful login attempt
+    return true;
+  } else {
+    logLogin(username, false); // Log the failed login attempt
+    return false;
+  }
 }
 
+// Log user login (success or failure) to the Admin-Logs sheet
+function logLogin(username, success) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Admin-Logs');
+  var date = new Date();
+  var status = success ? 'Success' : 'Failed'; // Log success or failure
+  sheet.appendRow([username, status, date.toLocaleDateString(), date.toLocaleTimeString()]);
+}
+
+// Update inventory based on the user's changes
 function updateInventory(row, stock, type, status) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Inventory');
   
   // Update Stock (E column, index 5)
-  sheet.getRange(row + 1, 5).setValue(stock); // Adjust row to match actual sheet indexing
+  sheet.getRange(row + 1, 5).setValue(stock);
   
   // Update Type (D column, index 4)
-  sheet.getRange(row + 1, 4).setValue(type); // Adjust row to match actual sheet indexing
+  sheet.getRange(row + 1, 4).setValue(type);
   
   // Update Status (R column, index 18)
-  sheet.getRange(row + 1, 18).setValue(status); // Adjust row to match actual sheet indexing
+  sheet.getRange(row + 1, 18).setValue(status);
 }
