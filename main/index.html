@@ -242,21 +242,34 @@
       document.getElementById('content').style.display = 'none';
     }
 
-    function handleLogin() {
-      var username = document.getElementById('username').value.trim();
-      var password = document.getElementById('password').value.trim();
+  function handleLogin() {
+    var username = document.getElementById('username').value.trim();
+    var password = document.getElementById('password').value.trim();
+    var userAgent = navigator.userAgent; // Get the user agent
 
-      google.script.run.withSuccessHandler(function(isValid) {
-        if (isValid) {
-          document.getElementById('loginForm').style.display = 'none';
-          document.getElementById('content').style.display = 'block';
-          loggedIn = true; // Mark as logged in
-          fetchInventoryData(); // Fetch data to enable editing
-        } else {
-          alert('Invalid username or password');
-        }
-      }).validateCredentials(username, password);
-    }
+    // Fetch the client's IP address
+    fetch('https://api.ipify.org?format=json')
+      .then(response => response.json())
+      .then(data => {
+        var clientIp = data.ip;
+
+        // Pass the IP address and user agent to the server-side function
+        google.script.run.withSuccessHandler(function(isValid) {
+          if (isValid) {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+            loggedIn = true; // Mark as logged in
+            fetchInventoryData(); // Fetch data to enable editing
+          } else {
+            alert('Invalid username or password');
+          }
+        }).validateCredentials(username, password, clientIp, userAgent);
+      })
+      .catch(error => {
+        console.error('Error fetching IP address:', error);
+        alert('Could not fetch your IP address. Try again later.');
+      });
+  }
 
     window.onload = fetchInventoryData;
   </script>
