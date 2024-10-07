@@ -143,6 +143,7 @@
       }
 
 // Display the parts data for the selected team
+// Display the parts data for the selected team
 function displayParts(data) {
   var table = document.getElementById('partsTable');
   table.innerHTML = ''; // Clear the table before loading new data
@@ -155,6 +156,11 @@ function displayParts(data) {
   headerRow.insertCell(3).innerHTML = '<strong>Update</strong>';
 
   data.forEach(function(row) {
+    // Check if 'used' is 'N/A', if so, skip this row
+    if (row.used === 'N/A') {
+      return; // Skip this row
+    }
+
     var newRow = table.insertRow();
     var partCell = newRow.insertCell(0);
     var categoryCell = newRow.insertCell(1);
@@ -172,26 +178,25 @@ function displayParts(data) {
     input.setAttribute('min', '0'); // Set the minimum value
     input.setAttribute('max', '100'); // Set the maximum value
 
-function handleUpdate() {
-  var part = input.getAttribute('data-part');
-  var newCount = parseFloat(input.value);
+    function handleUpdate() {
+      var part = input.getAttribute('data-part');
+      var newCount = parseFloat(input.value);
 
-  // Validate the value to be within min and max range
-  var minValue = parseFloat(input.getAttribute('min'));
-  var maxValue = parseFloat(input.getAttribute('max'));
+      // Validate the value to be within min and max range
+      var minValue = parseFloat(input.getAttribute('min'));
+      var maxValue = parseFloat(input.getAttribute('max'));
 
-  if (newCount < minValue) {
-    newCount = minValue;
-    input.value = newCount;
-  } else if (newCount > maxValue) {
-    newCount = maxValue;
-    input.value = newCount;
-  }
+      if (newCount < minValue) {
+        newCount = minValue;
+        input.value = newCount;
+      } else if (newCount > maxValue) {
+        newCount = maxValue;
+        input.value = newCount;
+      }
 
-  google.script.run.updatePartsData(team, part, newCount);
-  loadParts(); // Reload parts after update
-}
-
+      google.script.run.updatePartsData(team, part, newCount);
+      loadParts(); // Reload parts after update
+    }
 
     // Attach event listeners to the input
     input.addEventListener('blur', handleUpdate);
@@ -200,6 +205,7 @@ function handleUpdate() {
     updateCell.appendChild(input);
   });
 }
+
 
 
 
