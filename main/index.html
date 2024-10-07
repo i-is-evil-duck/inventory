@@ -157,85 +157,90 @@
     }
 
     function displayTable(data) {
-      var table = document.getElementById('inventoryTable').getElementsByTagName('tbody')[0];
-      table.innerHTML = ''; // Clear existing table
+  var table = document.getElementById('inventoryTable').getElementsByTagName('tbody')[0];
+  table.innerHTML = ''; // Clear existing table
 
-      data.forEach(function(row, index) {
-        var tr = document.createElement('tr');
+  data.forEach(function(row, index) {
+    // Check if the stock value is "N/A"
+    if (row[3] === "N/A") {
+      return; // Skip this row if stock is "N/A"
+    }
 
-        // ID (Non-editable)
-        var idCell = document.createElement('td');
-        idCell.textContent = row[0];
-        tr.appendChild(idCell);
+    var tr = document.createElement('tr');
 
-        // Item Name (Non-editable)
-        var itemNameCell = document.createElement('td');
-        itemNameCell.textContent = row[1];
-        tr.appendChild(itemNameCell);
+    // ID (Non-editable)
+    var idCell = document.createElement('td');
+    idCell.textContent = row[0];
+    tr.appendChild(idCell);
 
-        // Type (Dropdown)
-        var typeCell = document.createElement('td');
-        var typeSelect = document.createElement('select');
-        ["Electronics", "Sensor", "Motion", "Structure", "Wheel", "Hardware", "Pneumatics", "Tools"].forEach(function(optionValue) {
-          var option = document.createElement('option');
-          option.value = optionValue;
-          option.text = optionValue;
-          if (optionValue === row[2]) option.selected = true;
-          typeSelect.appendChild(option);
-        });
-        typeSelect.disabled = !loggedIn;
-        typeCell.appendChild(typeSelect);
-        tr.appendChild(typeCell);
+    // Item Name (Non-editable)
+    var itemNameCell = document.createElement('td');
+    itemNameCell.textContent = row[1];
+    tr.appendChild(itemNameCell);
 
-        // Stock (Editable only when logged in)
-        var stockCell = document.createElement('td');
-        var stockInput = document.createElement('input');
-        stockInput.type = 'number';
-        stockInput.value = row[3];
-        stockInput.disabled = !loggedIn;
-        stockCell.appendChild(stockInput);
-        tr.appendChild(stockCell);
+    // Type (Dropdown)
+    var typeCell = document.createElement('td');
+    var typeSelect = document.createElement('select');
+    ["Electronics", "Sensor", "Motion", "Structure", "Wheel", "Hardware", "Pneumatics", "Tools"].forEach(function(optionValue) {
+      var option = document.createElement('option');
+      option.value = optionValue;
+      option.text = optionValue;
+      if (optionValue === row[2]) option.selected = true;
+      typeSelect.appendChild(option);
+    });
+    typeSelect.disabled = !loggedIn;
+    typeCell.appendChild(typeSelect);
+    tr.appendChild(typeCell);
 
-        // In-Use (Non-editable)
-        var inUseCell = document.createElement('td');
-        inUseCell.textContent = row[4];
-        tr.appendChild(inUseCell);
+    // Stock (Editable only when logged in)
+    var stockCell = document.createElement('td');
+    var stockInput = document.createElement('input');
+    stockInput.type = 'number';
+    stockInput.value = row[3];
+    stockInput.disabled = !loggedIn;
+    stockCell.appendChild(stockInput);
+    tr.appendChild(stockCell);
 
-        // Status (Dropdown)
-        var statusCell = document.createElement('td');
-        var statusSelect = document.createElement('select');
-        ["In stock","Low", "Fully in use","Very Low","Extremely Low", "Re-stock needed", "Sold out", "Not needed", "Restocking"].forEach(function(optionValue) {
-          var option = document.createElement('option');
-          option.value = optionValue;
-          option.text = optionValue;
-          if (optionValue === row[16]) option.selected = true;
-          statusSelect.appendChild(option);
-        });
-        statusSelect.disabled = !loggedIn;
-        statusCell.appendChild(statusSelect);
-        tr.appendChild(statusCell);
+    // In-Use (Non-editable)
+    var inUseCell = document.createElement('td');
+    inUseCell.textContent = row[4];
+    tr.appendChild(inUseCell);
 
-        // Notes (Non-editable)
-        var notesCell = document.createElement('td');
-        notesCell.textContent = row[18];
-        tr.appendChild(notesCell);
+    // Status (Dropdown)
+    var statusCell = document.createElement('td');
+    var statusSelect = document.createElement('select');
+    ["In stock","Low", "Fully in use","Very Low","Extremely Low", "Re-stock needed", "Sold out", "Not needed", "Restocking"].forEach(function(optionValue) {
+      var option = document.createElement('option');
+      option.value = optionValue;
+      option.text = optionValue;
+      if (optionValue === row[16]) option.selected = true;
+      statusSelect.appendChild(option);
+    });
+    statusSelect.disabled = !loggedIn;
+    statusCell.appendChild(statusSelect);
+    tr.appendChild(statusCell);
 
-        // Add event listeners to save changes (only when logged in)
-        if (loggedIn) {
-          stockInput.addEventListener('change', function() {
-            google.script.run.updateInventory(index + 1, stockInput.value, typeSelect.value, statusSelect.value);
-          });
-          typeSelect.addEventListener('change', function() {
-            google.script.run.updateInventory(index + 1, stockInput.value, typeSelect.value, statusSelect.value);
-          });
-          statusSelect.addEventListener('change', function() {
-            google.script.run.updateInventory(index + 1, stockInput.value, typeSelect.value, statusSelect.value);
-          });
-        }
+    // Notes (Non-editable)
+    var notesCell = document.createElement('td');
+    notesCell.textContent = row[18];
+    tr.appendChild(notesCell);
 
-        table.appendChild(tr);
+    // Add event listeners to save changes (only when logged in)
+    if (loggedIn) {
+      stockInput.addEventListener('change', function() {
+        google.script.run.updateInventory(index + 1, stockInput.value, typeSelect.value, statusSelect.value);
+      });
+      typeSelect.addEventListener('change', function() {
+        google.script.run.updateInventory(index + 1, stockInput.value, typeSelect.value, statusSelect.value);
+      });
+      statusSelect.addEventListener('change', function() {
+        google.script.run.updateInventory(index + 1, stockInput.value, typeSelect.value, statusSelect.value);
       });
     }
+
+    table.appendChild(tr);
+  });
+}
 
     function showLogin() {
       document.getElementById('loginForm').style.display = 'block';
