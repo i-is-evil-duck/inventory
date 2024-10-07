@@ -1,277 +1,381 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <base target="_top">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      outline: none;
-      list-style: none;
-      text-decoration: none;
-      box-sizing: border-box;
-      color: #FFF;
-      background: transparent;
-      border: none;
-    }
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #2c2c2c;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      table-layout: fixed; /* Make sure the table respects the defined widths */
-    }
-    th, td {
-      padding: 10px;
-      text-align: left;
-      border: 1px solid rgba(100, 100, 100, 0.397);
-      white-space: nowrap; /* Prevent text wrapping */
-    }
-    th {
-      background-color: #444;
-    }
+<!-- Version 5 of R_Inventory -->
+                <!DOCTYPE html>
+                <html>
+                  <head> 
+                    <base target="_top">
+                    <style>
+/* STFU IDK THAT ITS NOT GOOD IT WORKS */
+                      body {
+                        font-family: Arial, sans-serif;
+                      }
+                      table {
+                        width: 100%;
+                        border-collapse: collapse;
+                      }
+                      th, td {
+                        padding: 10px;
+                        text-align: left;
+                        border: 1px solid rgba(100, 100, 100, 0.397);
+                      }
+                      th {
+                        background-color: #f2f2f2;
+                      }
+                    </style>
+    <script>
+      // Automatically load parts for the R_Inventory tab
+      function loadParts() {
+        google.script.run.withSuccessHandler(displayParts).getPartsData();
+      }
 
-    /* Control column widths separately using nth-child selectors */
-    td:nth-child(1), th:nth-child(1) { /* ID column */
-      width: 90px;
-    }
+      // Display the parts data for R_Inventory
+function displayParts(data) {
+  var table = document.getElementById('partsTable');
+  table.innerHTML = ''; // Clear the table before loading new data
 
-    td:nth-child(2), th:nth-child(2) { /* Item Name column */
-      width: 325px;
-    }
+  // Add header row
+  var headerRow = table.insertRow();
+  headerRow.insertCell(0).innerHTML = '<strong>Part</strong>';
+  headerRow.insertCell(1).innerHTML = '<strong>Category</strong>';
+  headerRow.insertCell(2).innerHTML = '<strong>Part ID</strong>';
+  headerRow.insertCell(3).innerHTML = '<strong>Stock</strong>';
+  headerRow.insertCell(4).innerHTML = '<strong>In Use</strong>';
 
-    td:nth-child(3), th:nth-child(3) { /* Type column */
-      width: 120px;
-    }
-
-    td:nth-child(4), th:nth-child(4) { /* Stock column */
-      width: 65px;
+  data.forEach(function(row) {
+    // Ignore the row if the stock value is "N/A"
+    if (row.stock === 'N/A') {
+      return; // Skip this iteration and move to the next row
     }
 
-    td:nth-child(5), th:nth-child(5) { /* In-Use column */
-      width: 66px;
-    }
+    // Create a new row and populate it with data
+    var newRow = table.insertRow();
+    newRow.insertCell(0).innerHTML = row.part;
+    newRow.insertCell(1).innerHTML = row.category;
+    newRow.insertCell(2).innerHTML = row.partId;
+    newRow.insertCell(3).innerHTML = row.stock;
+    newRow.insertCell(4).innerHTML = row.used;
+  });
+}
 
-    td:nth-child(6), th:nth-child(6) { /* Status column */
-      width: 80px;
-    }
 
-    td:nth-child(7), th:nth-child(7) { /* Notes column */
-      width: 200px;
-    }
+      // Function to filter parts by category and part name
+      function filterParts() {
+        var searchTerm = document.getElementById('searchBox').value.toLowerCase();
+        var category = document.getElementById('categorySelect').value;
+        var rows = document.getElementById('partsTable').rows;
 
-    #content {
-      padding: 20px;
-    }
-    #loginButton {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      padding: 10px 20px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    #loginButton:hover {
-      background-color: #0056b3;
-    }
-    #loginForm {
-      display: none;
-    }
-    #loginForm input {
-      padding: 10px;
-      margin: 10px 0;
-      width: 100%;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    #loginForm button {
-      padding: 10px 20px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    #loginForm button:hover {
-      background-color: #0056b3;
-    }
-    /* Dropdown styling to set the text color to black */
-    select {
-      color: white; /* Change the text color */
-      background-color: #161616; /* Optionally change the background color */
-      padding: 5px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
+        for (var i = 1; i < rows.length; i++) { // Start from 1 to skip the header row
+          var partName = rows[i].cells[0].innerHTML.toLowerCase();
+          var partCategory = rows[i].cells[1].innerHTML;
 
-    select:disabled {
-      color: grey; /* Set a different color when dropdown is disabled */
-    }
-  </style>
-</head>
-<body>
+          // Filter by search term and category
+          var matchName = partName.includes(searchTerm);
+          var matchCategory = category === '' || partCategory === category;
 
-  <!-- Login Form -->
-  <div id="loginForm" class="card">
-    <div class="content">
-      <h1 class="login">Login</h1>
-      <input type="text" id="username" placeholder="Enter username" required>
-      <br>
-      <input type="password" id="password" placeholder="Enter password" required>
-      <br>
-      <button onclick="handleLogin()">Login</button>
-    </div>
-  </div>
-
-  <!-- Inventory Table -->
-  <div id="content">
-    <h2>Inventory Table</h2>
-    <table id="inventoryTable">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Item Name</th>
-          <th>Type</th>
-          <th>Stock</th>
-          <th>In-Use</th>
-          <th>Status</th>
-          <th>Notes</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Rows will be inserted here -->
-      </tbody>
-    </table>
-  </div>
-
-  <button id="loginButton" onclick="showLogin()">Login</button>
-
-  <script>
-    let loggedIn = false;
-
-    function fetchInventoryData() {
-      google.script.run.withSuccessHandler(displayTable).getInventoryData();
-    }
-
-    function displayTable(data) {
-      var table = document.getElementById('inventoryTable').getElementsByTagName('tbody')[0];
-      table.innerHTML = ''; // Clear existing table
-
-      data.forEach(function(row, index) {
-        var tr = document.createElement('tr');
-
-        // ID (Non-editable)
-        var idCell = document.createElement('td');
-        idCell.textContent = row[0];
-        tr.appendChild(idCell);
-
-        // Item Name (Non-editable)
-        var itemNameCell = document.createElement('td');
-        itemNameCell.textContent = row[1];
-        tr.appendChild(itemNameCell);
-
-        // Type (Dropdown)
-        var typeCell = document.createElement('td');
-        var typeSelect = document.createElement('select');
-        ["Electronics", "Sensor", "Motion", "Structure", "Wheel", "Hardware", "Pneumatics", "Tools"].forEach(function(optionValue) {
-          var option = document.createElement('option');
-          option.value = optionValue;
-          option.text = optionValue;
-          if (optionValue === row[2]) option.selected = true;
-          typeSelect.appendChild(option);
-        });
-        typeSelect.disabled = !loggedIn;
-        typeCell.appendChild(typeSelect);
-        tr.appendChild(typeCell);
-
-        // Stock (Editable only when logged in)
-        var stockCell = document.createElement('td');
-        var stockInput = document.createElement('input');
-        stockInput.type = 'number';
-        stockInput.value = row[3];
-        stockInput.disabled = !loggedIn;
-        stockCell.appendChild(stockInput);
-        tr.appendChild(stockCell);
-
-        // In-Use (Non-editable)
-        var inUseCell = document.createElement('td');
-        inUseCell.textContent = row[4];
-        tr.appendChild(inUseCell);
-
-        // Status (Dropdown)
-        var statusCell = document.createElement('td');
-        var statusSelect = document.createElement('select');
-        ["In stock","Low", "Fully in use","Very Low","Extremely Low", "Re-stock needed", "Sold out", "Not needed", "Restocking"].forEach(function(optionValue) {
-          var option = document.createElement('option');
-          option.value = optionValue;
-          option.text = optionValue;
-          if (optionValue === row[16]) option.selected = true;
-          statusSelect.appendChild(option);
-        });
-        statusSelect.disabled = !loggedIn;
-        statusCell.appendChild(statusSelect);
-        tr.appendChild(statusCell);
-
-        // Notes (Non-editable)
-        var notesCell = document.createElement('td');
-        notesCell.textContent = row[18];
-        tr.appendChild(notesCell);
-
-        // Add event listeners to save changes (only when logged in)
-        if (loggedIn) {
-          stockInput.addEventListener('change', function() {
-            google.script.run.updateInventory(index + 1, stockInput.value, typeSelect.value, statusSelect.value);
-          });
-          typeSelect.addEventListener('change', function() {
-            google.script.run.updateInventory(index + 1, stockInput.value, typeSelect.value, statusSelect.value);
-          });
-          statusSelect.addEventListener('change', function() {
-            google.script.run.updateInventory(index + 1, stockInput.value, typeSelect.value, statusSelect.value);
-          });
+          rows[i].style.display = (matchName && matchCategory) ? '' : 'none';
         }
+      }
+    </script>
+                  </head>
+                  <body onload="loadParts()"> <!-- Load R_Inventory data on page load -->
+                <div class="card">
+                    <h1>R_Inventory Parts Tracker</h1>
 
-        table.appendChild(tr);
-      });
-    }
+                    <!-- Search by part name -->
+                    <input type="text" id="searchBox" placeholder="Search by part name" onkeyup="filterParts()">
 
-    function showLogin() {
-      document.getElementById('loginForm').style.display = 'block';
-      document.getElementById('content').style.display = 'none';
-    }
+                    <!-- Sort by part category -->
+                    <label for="categorySelect">Filter by Category: </label>
+                    <select class="dropdown" id="categorySelect" onchange="filterParts()">
+                      <option value="">All Categories</option>
+                      <option value="Electronics">Electronics</option>
+                      <option value="Sensor">Sensor</option>
+                      <option value="Motion">Motion</option>
+                      <option value="Structure">Structure</option>
+                      <option value="Wheel">Wheel</option>
+                      <option value="Hardware">Hardware</option>
+                      <option value="Pneumatics">Pneumatics</option>
+                      <option value="Tools">Tools</option>
+                    </select>
 
-  function handleLogin() {
-    var username = document.getElementById('username').value.trim();
-    var password = document.getElementById('password').value.trim();
-    var userAgent = navigator.userAgent; // Get the user agent
+                    <table border="1" id="partsTable">
+                      <!-- Header row and data rows will be dynamically inserted here -->
+                    </table>
+                    </div>
+                    <style>
+                        :root {
+                        --color-bg1: rgb(8, 10, 15);
+                        --color-bg2: rgb(0, 17, 32);
+                        --color1: 18, 113, 255;
+                        --color2: 107, 74, 255;
+                        --color3: 100, 100, 255;
+                        --color4: 50, 160, 220;
+                        --color5: 80, 47, 122;
+                        --color-interactive: 140, 100, 255;
+                        --circle-size: 80%;
+                        --blending: hard-light;
+                      }
 
-    // Fetch the client's IP address
-    fetch('https://api.ipify.org?format=json')
-      .then(response => response.json())
-      .then(data => {
-        var clientIp = data.ip;
+                      * {
+                        margin: 0;
+                        padding: 10px;
+                        outline: none;
+                        list-style: none;
+                        text-decoration: none;
+                        box-sizing: border-box;
+                        color: #FFF;
+                        background: transparent;
+                        border: none;
+                      }
 
-        // Pass the IP address and user agent to the server-side function
-        google.script.run.withSuccessHandler(function(isValid) {
-          if (isValid) {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('content').style.display = 'block';
-            loggedIn = true; // Mark as logged in
-            fetchInventoryData(); // Fetch data to enable editing
-          } else {
-            alert('Invalid username or password');
-          }
-        }).validateCredentials(username, password, clientIp, userAgent);
-      })
-      .catch(error => {
-        console.error('Error fetching IP address:', error);
-        alert('Could not fetch your IP address. Try again later.');
-      });
-  }
+      .dropdown {
 
-    window.onload = fetchInventoryData;
-  </script>
-</body>
-</html>
+          background-color: transparent;
+        color: white; /* Sets the text color inside the dropdown */
+  border: 1px solid white; /* Optional: adds a border for better visibility */
+  border-radius: 8px; /* Optional: rounds the corners of the dropdown */
+      }
+      
+      .dropdown option {
+  background-color: rgb(44, 44, 71); /* Sets the background color of the options */
+  color: white; /* Sets the text color of the options */
+}
+
+                      .card-list {
+                        position: absolute;
+                        z-index: 10;
+                        left: 15%;
+                        right: 15%;
+                        transform: translate(0%, 1.5%);
+                        user-select: none;
+                        -webkit-backdrop-filter: blur(10px);
+                        backdrop-filter: blur(10px);
+                        border-radius: 8px;
+                        box-shadow: 0 4px 90px rgba(0, 0, 0, 0.1);
+                        overflow: hidden;
+                      }
+
+
+
+
+                      .card {
+                        position: absolute;
+                        z-index: 10;
+                        left: 15%;
+                        right: 15%;
+                        transform: translate(0%, 1.5%);
+                        user-select: none;
+                        padding: 48px;
+                        -webkit-backdrop-filter: blur(10px);
+                        backdrop-filter: blur(10px);
+                        border-radius: 8px;
+                        box-shadow: 0 4px 90px rgba(0, 0, 0, 0.1);
+                        overflow: hidden;
+                      }
+                      .card:before {
+                        content: "";
+                        position: absolute;
+                        z-index: 2;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 2px;
+                        background: white;
+                        background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, white 34%, white 89%, rgba(255, 255, 255, 0) 100%);
+                        opacity: 0.3;
+                        filter: blur(0.5px);
+                        mix-blend-mode: hard-light;
+                      }
+                      .card .noise {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        height: 100%;
+                        width: 100%;
+                        z-index: 1;
+                        opacity: 0.1;
+                      }
+                      .card .content {
+                        position: relative;
+                        z-index: 2;
+                        text-shadow: -3px 0px 2px rgba(0, 0, 0, 0.1);
+                      }
+
+
+                      @keyframes moveInCircle {
+                        0% {
+                          transform: rotate(0deg);
+                        }
+                        50% {
+                          transform: rotate(180deg);
+                        }
+                        100% {
+                          transform: rotate(360deg);
+                        }
+                      }
+                      @keyframes moveVertical {
+                        0% {
+                          transform: translateY(-50%);
+                        }
+                        50% {
+                          transform: translateY(50%);
+                        }
+                        100% {
+                          transform: translateY(-50%);
+                        }
+                      }
+                      @keyframes moveHorizontal {
+                        0% {
+                          transform: translateX(-50%) translateY(-10%);
+                        }
+                        50% {
+                          transform: translateX(50%) translateY(10%);
+                        }
+                        100% {
+                          transform: translateX(-50%) translateY(-10%);
+                        }
+                      }
+                      .gradient-bg {
+                        width: 100vw;
+                        height: 100vh;
+                        position: fixed;
+                        overflow: hidden;
+                        background: linear-gradient(40deg, var(--color-bg1), var(--color-bg2));
+                        top: 0;
+                        left: 0;
+                      }
+                      .gradient-bg .svgBlur {
+                        display: none;
+                      }
+                      .gradient-bg .noiseBg {
+                        position: absolute;
+                        width: 100%;
+                        height: 100%;
+                        top: 0;
+                        left: 0;
+                        z-index: 1;
+                        mix-blend-mode: soft-light;
+                        opacity: 0.3;
+                      }
+                      .gradient-bg .gradients-container {
+                        filter: url(#goo) blur(40px);
+                        width: 100%;
+                        height: 100%;
+                      }
+                      .gradient-bg .g1 {
+                        position: absolute;
+                        background: radial-gradient(circle at center, rgba(var(--color1), 0.8) 0, rgba(var(--color1), 0) 50%) no-repeat;
+                        mix-blend-mode: var(--blending);
+                        width: var(--circle-size);
+                        height: var(--circle-size);
+                        top: calc(50% - var(--circle-size) / 2);
+                        left: calc(50% - var(--circle-size) / 2);
+                        transform-origin: center center;
+                        animation: moveVertical 30s ease infinite;
+                        opacity: 1;
+                      }
+                      .gradient-bg .g2 {
+                        position: absolute;
+                        background: radial-gradient(circle at center, rgba(var(--color2), 0.8) 0, rgba(var(--color2), 0) 50%) no-repeat;
+                        mix-blend-mode: var(--blending);
+                        width: var(--circle-size);
+                        height: var(--circle-size);
+                        top: calc(50% - var(--circle-size) / 2);
+                        left: calc(50% - var(--circle-size) / 2);
+                        transform-origin: calc(50% - 400px);
+                        animation: moveInCircle 20s reverse infinite;
+                        opacity: 1;
+                      }
+                      .gradient-bg .g3 {
+                        position: absolute;
+                        background: radial-gradient(circle at center, rgba(var(--color3), 0.8) 0, rgba(var(--color3), 0) 50%) no-repeat;
+                        mix-blend-mode: var(--blending);
+                        width: var(--circle-size);
+                        height: var(--circle-size);
+                        top: calc(50% - var(--circle-size) / 2 + 200px);
+                        left: calc(50% - var(--circle-size) / 2 - 500px);
+                        transform-origin: calc(50% + 400px);
+                        animation: moveInCircle 40s linear infinite;
+                        opacity: 1;
+                      }
+                      .gradient-bg .g4 {
+                        position: absolute;
+                        background: radial-gradient(circle at center, rgba(var(--color4), 0.8) 0, rgba(var(--color4), 0) 50%) no-repeat;
+                        mix-blend-mode: var(--blending);
+                        width: var(--circle-size);
+                        height: var(--circle-size);
+                        top: calc(50% - var(--circle-size) / 2);
+                        left: calc(50% - var(--circle-size) / 2);
+                        transform-origin: calc(50% - 200px);
+                        animation: moveHorizontal 40s ease infinite;
+                        opacity: 0.7;
+                      }
+                      .gradient-bg .g5 {
+                        position: absolute;
+                        background: radial-gradient(circle at center, rgba(var(--color5), 0.8) 0, rgba(var(--color5), 0) 50%) no-repeat;
+                        mix-blend-mode: var(--blending);
+                        width: calc(var(--circle-size) * 2);
+                        height: calc(var(--circle-size) * 2);
+                        top: calc(50% - var(--circle-size));
+                        left: calc(50% - var(--circle-size));
+                        transform-origin: calc(50% - 800px) calc(50% + 200px);
+                        animation: moveInCircle 20s ease infinite;
+                        opacity: 1;
+                      }
+                      .gradient-bg .interactive {
+                        position: absolute;
+                        background: radial-gradient(circle at center, rgba(var(--color-interactive), 0.8) 0, rgba(var(--color-interactive), 0) 50%) no-repeat;
+                        mix-blend-mode: var(--blending);
+                        width: 100%;
+                        height: 100%;
+                        top: -50%;
+                        left: -50%;
+                        opacity: 0.7;
+                      }
+                      </style>
+                      <div class="gradient-bg">
+                          <filter id='noiseFilterBg'>
+                            <feTurbulence 
+                                          type='fractalNoise'
+                                          baseFrequency='0.6'
+                                          stitchTiles='stitch' />
+                          </filter>
+                        </svg>
+                          <defs>
+                            <filter id="goo">
+                              <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+                              <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
+                              <feBlend in="SourceGraphic" in2="goo" />
+                            </filter>
+                          </defs>
+                        </svg>
+                        <div class="gradients-container">
+                          <div class="g1"></div>
+                          <div class="g2"></div>
+                          <div class="g3"></div>
+                          <div class="g4"></div>
+                          <div class="g5"></div>
+                          <div class="interactive"></div>
+                        </div>
+                      </div>
+                        <script>
+                      document.addEventListener('DOMContentLoaded', () => {
+                        const interBubble = document.querySelector('.interactive');
+                        let curX = 0;
+                        let curY = 0;
+                        let tgX = 0;
+                        let tgY = 0;
+                        const move = () => {
+                          curX += (tgX - curX) / 20;
+                          curY += (tgY - curY) / 20;
+                          interBubble.style.transform = translate(${Math.round(curX)}px, ${Math.round(curY)}px);
+                          requestAnimationFrame(move);
+                        };
+                        window.addEventListener('mousemove', event => {
+                          tgX = event.clientX;
+                          tgY = event.clientY;
+                        });
+                        move();
+                      });
+                        </script>
+                  </body>
+                </html>
